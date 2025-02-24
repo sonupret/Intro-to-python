@@ -1,0 +1,33 @@
+from Bio import SeqIO  
+
+#naming the files
+input_file = "gc_fasta.fa"
+high_gc_file = "high_gc_sequences.fa"
+low_gc_file = "low_gc_sequences.fa"
+
+# we will be needing file to store sequences 
+high_gc_sequences = []
+low_gc_sequences = []
+
+print("Reading FASTA file and computing GC content...")
+
+for record in SeqIO.parse(input_file, "fasta"): 
+    sequence = str(record.seq)
+    gc_count = sequence.count('G') + sequence.count('C')
+    gc_content = (gc_count / len(sequence)) * 100 if len(sequence) > 0 else 0
+
+    if gc_content > 40:  
+        high_gc_sequences.append(record)
+        print(f"{record.id}: GC content = {gc_content:.2f}% (HIGH)")
+
+    while gc_content <= 40:  
+        low_gc_sequences.append(record)
+        print(f"{record.id}: GC content = {gc_content:.2f}% (LOW)")
+        break  
+
+#  categorizing sequences to separate FASTA files
+SeqIO.write(high_gc_sequences, high_gc_file, "fasta")  
+SeqIO.write(low_gc_sequences, low_gc_file, "fasta")  
+
+print(f"\n Sequences with GC content > 40% saved in '{high_gc_file}'.")
+print(f" Sequences with GC content <= 40% saved in '{low_gc_file}'.")
